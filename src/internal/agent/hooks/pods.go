@@ -114,6 +114,19 @@ func mutatePod(ctx context.Context, r *v1.AdmissionRequest, cluster *cluster.Clu
 		patches = append(patches, operations.ReplacePatchOperation(path, replacement))
 	}
 
+	// update the image host for each volume that contains a "image" reference
+	for idx, volume := range pod.Spec.Volumes {
+		if volume.Image != nil {
+			path := fmt.Sprintf("/spec/volume/%d/image/reference", idx)
+			replacement, err := transform.ImageTransformHost(registryURL, volume.Image.Reference)
+			if err != nil {
+				return nil, err
+			}
+			updatedAnnotations[getImageAnnotationKey(volume.Image.Reference)] = volume.Image.Reference
+			patches = append(patches, operations.ReplacePatchOperation(path, replacement))
+		}
+	}
+
 	patches = append(patches, getLabelPatch(pod.Labels))
 
 	patches = append(patches, operations.ReplacePatchOperation("/metadata/annotations", updatedAnnotations))

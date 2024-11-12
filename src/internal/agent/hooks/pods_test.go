@@ -60,6 +60,24 @@ func TestPodMutationWebhook(t *testing.T) {
 							},
 						},
 					},
+					Volumes: []corev1.Volume{
+						{Name: "config-map",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "not-mutate-cm",
+									},
+								},
+							},
+						},
+						{Name: "image",
+							VolumeSource: corev1.VolumeSource{
+								Image: &corev1.ImageVolumeSource{
+									Reference: "quay.io/crio/artifact:v1",
+								},
+							},
+						},
+					},
 				},
 			}),
 			patch: []operations.PatchOperation{
@@ -80,6 +98,10 @@ func TestPodMutationWebhook(t *testing.T) {
 					"127.0.0.1:31999/library/nginx:latest-zarf-3793515731",
 				),
 				operations.ReplacePatchOperation(
+					"/spec/volume/1/image/reference",
+					"127.0.0.1:31999/crio/artifact:v1-zarf-2568457951",
+				),
+				operations.ReplacePatchOperation(
 					"/metadata/labels",
 					map[string]string{
 						"zarf-agent": "patched",
@@ -89,10 +111,11 @@ func TestPodMutationWebhook(t *testing.T) {
 				operations.ReplacePatchOperation(
 					"/metadata/annotations",
 					map[string]string{
-						"zarf.dev/original-image-nginx":     "nginx",
-						"zarf.dev/original-image-alpine":    "alpine",
-						"zarf.dev/original-image-different": "busybox",
-						"should-be":                         "mutated",
+						"should-be":                                        "mutated",
+						"zarf.dev/original-image-nginx":                    "nginx",
+						"zarf.dev/original-image-alpine":                   "alpine",
+						"zarf.dev/original-image-different":                "busybox",
+						"zarf.dev/original-image-quay.io/crio/artifact:v1": "quay.io/crio/artifact:v1",
 					},
 				),
 			},

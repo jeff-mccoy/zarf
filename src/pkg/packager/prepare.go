@@ -8,13 +8,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/zarf-dev/zarf/src/pkg/logger"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/zarf-dev/zarf/src/pkg/logger"
 
 	"github.com/defenseunicorns/pkg/helpers/v2"
 	"github.com/goccy/go-yaml"
@@ -461,6 +462,11 @@ func appendToImageMap(imgMap map[string]bool, pod corev1.PodSpec) map[string]boo
 	}
 	for _, container := range pod.EphemeralContainers {
 		imgMap[container.Image] = true
+	}
+	for _, volume := range pod.Volumes {
+		if volume.Image != nil {
+			imgMap[volume.Image.Reference] = true
+		}
 	}
 	return imgMap
 }
