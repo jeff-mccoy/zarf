@@ -69,7 +69,7 @@ Any binaries you execute in your `cmd` actions must exist on the machine they ar
 
 ### `wait` Action Configuration
 
-The `wait` action temporarily halts the component stage it"s initiated in, either until the specified condition is satisfied or until the maxTotalSeconds time limit is exceeded (which, by default, is set to 5 minutes). To define `wait` parameters, execute the `wait` key; it"s essential to note that _you cannot use `cmd` and `wait` in the same action_. Essentially, a `wait` action is _yaml sugar_ for a call to `./zarf tools wait-for`.
+The `wait` action temporarily halts the component stage it is initiated in, either until the specified condition is satisfied or until the maxTotalSeconds time limit is exceeded (which, by default, is set to 5 minutes). To define `wait` parameters, execute the `wait` key; it is essential to note that _you cannot use `cmd` and `wait` in the same action_. Essentially, a `wait` action is _yaml sugar_ for a call to `./zarf tools wait-for`.
 
 Within each of the `action` lists (`before`, `after`, `onSuccess`, and `onFailure`), the following action configurations are available:
 

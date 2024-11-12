@@ -88,9 +88,15 @@ func testGitServerReadOnly(ctx context.Context, t *testing.T, gitURL string) {
 	require.NoError(t, err)
 	permissionsMap, ok := bodyMap["permissions"].(map[string]interface{})
 	require.True(t, ok, "permissions key is not of right type")
-	require.False(t, permissionsMap["admin"].(bool))
-	require.False(t, permissionsMap["push"].(bool))
-	require.True(t, permissionsMap["pull"].(bool))
+	admin, ok := permissionsMap["admin"].(bool)
+	require.True(t, ok)
+	require.False(t, admin)
+	push, ok := permissionsMap["push"].(bool)
+	require.True(t, ok)
+	require.False(t, push)
+	pull, ok := permissionsMap["pull"].(bool)
+	require.True(t, ok)
+	require.True(t, pull)
 }
 
 func testGitServerTagAndHash(ctx context.Context, t *testing.T, gitURL string) {

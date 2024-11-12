@@ -67,7 +67,7 @@ func TestCreateDifferential(t *testing.T) {
 	}
 	require.Len(t, actualGitRepos, 4, "zarf.yaml from the differential package does not contain the correct number of repos")
 	for _, expectedRepo := range expectedGitRepos {
-		require.Contains(t, actualGitRepos, expectedRepo, fmt.Sprintf("unable to find expected repo %s", expectedRepo))
+		require.Contains(t, actualGitRepos, expectedRepo, "unable to find expected repo %s", expectedRepo)
 	}
 
 	/* Validate we have ONLY the images we expect to have */
@@ -77,6 +77,6 @@ func TestCreateDifferential(t *testing.T) {
 	}
 	require.Len(t, actualImages, 2, "zarf.yaml from the differential package does not contain the correct number of images")
 	for _, expectedImage := range expectedImages {
-		require.Contains(t, actualImages, expectedImage, fmt.Sprintf("unable to find expected image %s", expectedImage))
+		require.Contains(t, actualImages, expectedImage, "unable to find expected image %s", expectedImage)
 	}
 }

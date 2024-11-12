@@ -136,15 +136,15 @@ func PrintCredentialUpdates(oldState *types.ZarfState, newState *types.ZarfState
 	pterm.Println()
 }
 
-func compareStrings(old string, new string, secret bool) string {
-	if new == old {
+func compareStrings(curent string, updated string, secret bool) string {
+	if updated == curent {
 		if secret {
 			return "**sanitized** (unchanged)"
 		}
-		return fmt.Sprintf("%s (unchanged)", old)
+		return fmt.Sprintf("%s (unchanged)", curent)
 	}
 	if secret {
 		return fmt.Sprintf("%s -> %s", pterm.FgRed.Sprint("**existing (sanitized)**"), pterm.FgGreen.Sprint("**replacement (sanitized)**"))
 	}
-	return fmt.Sprintf("%s -> %s", pterm.FgRed.Sprint(old), pterm.FgGreen.Sprint(new))
+	return fmt.Sprintf("%s -> %s", pterm.FgRed.Sprint(curent), pterm.FgGreen.Sprint(updated))
 }

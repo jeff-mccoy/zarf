@@ -45,7 +45,9 @@ func TestInjector(t *testing.T) {
 		gvk := delAction.Resource.GroupVersion().WithKind("ConfigMap")
 		list, err := cs.Tracker().List(gvr, gvk, delAction.Namespace)
 		require.NoError(t, err)
-		for _, cm := range list.(*corev1.ConfigMapList).Items {
+		cmList, ok := list.(*corev1.ConfigMapList)
+		require.True(t, ok)
+		for _, cm := range cmList.Items {
 			v, ok := cm.Labels["zarf-injector"]
 			if !ok {
 				continue

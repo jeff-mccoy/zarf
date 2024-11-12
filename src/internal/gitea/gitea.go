@@ -32,7 +32,11 @@ func NewClient(endpoint, username, password string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		return nil, errors.New("could not get default transport")
+	}
+	transport = transport.Clone()
 	transport.MaxIdleConnsPerHost = transport.MaxIdleConns
 	httpClient := &http.Client{
 		Timeout:   10 * time.Second,

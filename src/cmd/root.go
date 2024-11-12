@@ -98,11 +98,11 @@ func preRun(cmd *cobra.Command, _ []string) error {
 		ctx := logger.WithLoggingEnabled(ctx, true)
 		cmd.SetContext(ctx)
 	}
-	err = setupMessage(messageCfg{
-		level:           LogLevelCLI,
-		skipLogFile:     skipLogFile,
-		noColor:         NoColor,
-		featureDisabled: disableMessage,
+	err = SetupMessage(MessageCfg{
+		Level:           LogLevelCLI,
+		SkipLogFile:     skipLogFile,
+		NoColor:         NoColor,
+		FeatureDisabled: disableMessage,
 	})
 	if err != nil {
 		return err
@@ -208,19 +208,20 @@ func setupLogger(level, format string) (*slog.Logger, error) {
 	return l, nil
 }
 
-type messageCfg struct {
-	level       string
-	skipLogFile bool
-	noColor     bool
-	// featureDisabled is a feature flag that disables it
-	featureDisabled bool
+// MessageCfg is used to configure the Message package output options.
+type MessageCfg struct {
+	Level       string
+	SkipLogFile bool
+	NoColor     bool
+	// FeatureDisabled is a feature flag that disables it
+	FeatureDisabled bool
 }
 
-// setupMessage configures message while we migrate over to logger.
-func setupMessage(cfg messageCfg) error {
+// SetupMessage configures message while we migrate over to logger.
+func SetupMessage(cfg MessageCfg) error {
 	// HACK(mkcp): Discard message logs if feature is disabled. message calls InitializePTerm once in its init() fn so
 	//             this ends up being a messy solution.
-	if cfg.featureDisabled {
+	if cfg.FeatureDisabled {
 		// Discard all* PTerm messages. *see below
 		message.InitializePTerm(io.Discard)
 		// Disable all progress bars and spinners
@@ -228,12 +229,12 @@ func setupMessage(cfg messageCfg) error {
 		return nil
 	}
 
-	if cfg.noColor {
+	if cfg.NoColor {
 		message.DisableColor()
 	}
 
-	level := cfg.level
-	if cfg.level != "" {
+	level := cfg.Level
+	if cfg.Level != "" {
 		match := map[string]message.LogLevel{
 			// NOTE(mkcp): Add error for forwards compatibility with logger
 			"error": message.WarnLevel,
@@ -256,7 +257,7 @@ func setupMessage(cfg messageCfg) error {
 		message.NoProgress = true
 	}
 
-	if !cfg.skipLogFile {
+	if !cfg.SkipLogFile {
 		ts := time.Now().Format("2006-01-02-15-04-05")
 		f, err := os.CreateTemp("", fmt.Sprintf("zarf-%s-*.log", ts))
 		if err != nil {

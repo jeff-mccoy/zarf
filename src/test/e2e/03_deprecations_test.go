@@ -91,5 +91,5 @@ func TestDeprecatedSetAndPackageVariables(t *testing.T) {
       before:
       - cmd: echo "Zarf-The-Axolotl"
 `
-	require.Equal(t, expectedYaml, string(b))
+	require.YAMLEq(t, expectedYaml, string(b))
 }
