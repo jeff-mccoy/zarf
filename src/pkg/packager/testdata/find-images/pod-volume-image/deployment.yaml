@@ -15,6 +15,9 @@ spec:
         - name: agent
           image: ghcr.io/zarf-dev/zarf/agent:v0.38.1
       volume:
+        - name: config-volume
+          configMap:
+            name: special-config
         - name: image
           image:
             reference: quay.io/crio/artifact:v1
