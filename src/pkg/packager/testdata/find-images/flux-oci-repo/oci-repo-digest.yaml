@@ -1,0 +1,10 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: podinfo-digest
+spec:
+  interval: 30s
+  url: oci://ghcr.io/stefanprodan/manifests/podinfo
+  ref:
+    digest: sha256:fc60d367cc05bedae04d6030e270daa89c3d82fa18b1a155314102b2fca39652

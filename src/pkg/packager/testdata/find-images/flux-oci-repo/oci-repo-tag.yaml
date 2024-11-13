@@ -1,0 +1,10 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: podinfo-tag
+spec:
+  interval: 30s
+  url: oci://ghcr.io/stefanprodan/manifests/podinfo
+  ref:
+    tag: 6.4.1
