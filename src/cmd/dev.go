@@ -256,7 +256,7 @@ var devFindImagesCmd = &cobra.Command{
 		}
 		defer pkgClient.ClearTempPaths()
 
-		_, err = pkgClient.FindImages(cmd.Context())
+		imagesMap, err := pkgClient.FindImages(cmd.Context())
 
 		var lintErr *lint.LintError
 		if errors.As(err, &lintErr) {
@@ -267,7 +267,9 @@ var devFindImagesCmd = &cobra.Command{
 			}
 			common.PrintFindings(lintErr)
 		}
-		if err != nil {
+		if len(imagesMap) > 0 {
+			common.PrintComponentTable(imagesMap)
+		} else if err != nil {
 			return fmt.Errorf("unable to find images: %w", err)
 		}
 		return nil

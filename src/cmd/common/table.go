@@ -14,6 +14,27 @@ import (
 	"github.com/zarf-dev/zarf/src/pkg/message"
 )
 
+const (
+	COMPONENTS string = "components:"
+	NAME       string = "  - name: %s\n"
+	IMAGES     string = "    images:"
+	IMAGE      string = "      - %s\n"
+)
+
+// PrintComponentTable prints the components with found images.
+func PrintComponentTable(imagesMap map[string][]string) {
+	fmt.Println(COMPONENTS)
+	for component, images := range imagesMap {
+		fmt.Printf(NAME, component)
+		if len(images) > 0 {
+			fmt.Println(IMAGES)
+			for i := 0; i < len(images); i++ {
+				fmt.Printf(IMAGE, images[i])
+			}
+		}
+	}
+}
+
 // PrintFindings prints the findings in the LintError as a table.
 func PrintFindings(lintErr *lint.LintError) {
 	mapOfFindingsByPath := lint.GroupFindingsByPath(lintErr.Findings, lintErr.PackageName)

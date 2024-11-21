@@ -8,13 +8,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/zarf-dev/zarf/src/pkg/logger"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/zarf-dev/zarf/src/pkg/logger"
 
 	"github.com/defenseunicorns/pkg/helpers/v2"
 	"github.com/goccy/go-yaml"
@@ -79,7 +80,6 @@ func (p *Packager) FindImages(ctx context.Context) (map[string][]string, error) 
 	return p.findImages(ctx)
 }
 
-// TODO: Refactor to return output string instead of printing inside of function.
 func (p *Packager) findImages(ctx context.Context) (map[string][]string, error) {
 	l := logger.From(ctx)
 	for _, component := range p.cfg.Pkg.Components {
@@ -117,7 +117,6 @@ func (p *Packager) findImages(ctx context.Context) (map[string][]string, error) 
 		ArtifactServer: artifactServer,
 	}
 
-	componentDefinition := "\ncomponents:\n"
 	imagesMap := map[string][]string{}
 	whyResources := []string{}
 	for _, component := range p.cfg.Pkg.Components {
@@ -284,13 +283,7 @@ func (p *Packager) findImages(ctx context.Context) (map[string][]string, error) 
 		sortedMatchedImages, sortedExpectedImages := getSortedImages(matchedImages, maybeImages)
 
 		if len(sortedMatchedImages) > 0 {
-			// Log the header comment
-			componentDefinition += fmt.Sprintf("\n  - name: %s\n    images:\n", component.Name)
-			for _, image := range sortedMatchedImages {
-				// Use print because we want this dumped to stdout
-				imagesMap[component.Name] = append(imagesMap[component.Name], image)
-				componentDefinition += fmt.Sprintf("      - %s\n", image)
-			}
+			imagesMap[component.Name] = append(imagesMap[component.Name], sortedMatchedImages...)
 		}
 
 		// Handle the "maybes"
@@ -310,11 +303,7 @@ func (p *Packager) findImages(ctx context.Context) (map[string][]string, error) 
 			}
 
 			if len(validImages) > 0 {
-				componentDefinition += fmt.Sprintf("      # Possible images - %s - %s\n", p.cfg.Pkg.Metadata.Name, component.Name)
-				for _, image := range validImages {
-					imagesMap[component.Name] = append(imagesMap[component.Name], image)
-					componentDefinition += fmt.Sprintf("      - %s\n", image)
-				}
+				imagesMap[component.Name] = append(imagesMap[component.Name], validImages...)
 			}
 		}
 
@@ -348,10 +337,6 @@ func (p *Packager) findImages(ctx context.Context) (map[string][]string, error) 
 
 				if len(cosignArtifactList) > 0 {
 					imagesMap[component.Name] = append(imagesMap[component.Name], cosignArtifactList...)
-					componentDefinition += fmt.Sprintf("      # Cosign artifacts for images - %s - %s\n", p.cfg.Pkg.Metadata.Name, component.Name)
-					for _, cosignArtifact := range cosignArtifactList {
-						componentDefinition += fmt.Sprintf("      - %s\n", cosignArtifact)
-					}
 				}
 			}
 		}
@@ -363,8 +348,6 @@ func (p *Packager) findImages(ctx context.Context) (map[string][]string, error) 
 		}
 		return nil, nil
 	}
-
-	fmt.Println(componentDefinition)
 
 	return imagesMap, nil
 }
