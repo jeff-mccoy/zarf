@@ -155,7 +155,7 @@ variables:
     prompt: true
 ```
 
-To use these variables in our chart we must add their corresponding templates to our `wordpress-values.yaml` file.  Zarf can template chart values, manifests, included text files and more.
+To use these variables in our chart we must add their corresponding templates to our `wordpress-values.yaml` file. Replace the hard-coded values in `wordpress-values.yaml` with the following template. Zarf can template chart values, manifests, included text files and more.
 
 ```yaml
 wordpressUsername: ###ZARF_VAR_WORDPRESS_USERNAME###
@@ -176,7 +176,7 @@ When dealing with `sensitive` values in Zarf it is strongly recommended to not i
 
 As-is, our package could be configured to interface with an ingress provider to provide access to our blog, but this may not be desired for every service, particularly those that provide a backend for other frontend services.  To help with debugging, Zarf allows you to specify Zarf Connect Services that will be displayed after package deployment to quickly connect into our deployed application.
 
-For this package we will define two services, one for the blog and the other for the admin panel.  These are normal Kubernetes services with special labels and annotations that Zarf watches out for, and to defined them create a `connect-services.yaml` with the following contents:
+For this package we will define two services, one for the blog and the other for the admin panel.  These are normal Kubernetes services with special labels and annotations that Zarf watches out for, and to define them, create a `connect-services.yaml` with the following contents:
 
 ```yaml
 apiVersion: v1
