@@ -19,18 +19,67 @@ import (
 	goyaml "github.com/goccy/go-yaml"
 	"github.com/mholt/archiver/v3"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
 	"github.com/zarf-dev/zarf/src/api/v1alpha1"
 	"github.com/zarf-dev/zarf/src/config"
 	"github.com/zarf-dev/zarf/src/pkg/layout"
+	"github.com/zarf-dev/zarf/src/pkg/logger"
 	"github.com/zarf-dev/zarf/src/pkg/packager/filters"
+	"github.com/zarf-dev/zarf/src/pkg/packager/sources"
 	"github.com/zarf-dev/zarf/src/pkg/utils"
 	"github.com/zarf-dev/zarf/src/pkg/zoci"
 )
 
+// Check the thing
+// TODO: write unit tests
+func CheckIfPackageExists(ctx context.Context, src string, dir string) (bool, error) {
+	newRemote, err := zoci.NewRemote(ctx, src, oci.PlatformForArch(config.GetArch()))
+
+	if err != nil {
+		return false, err
+	}
+
+	pkg, err := newRemote.FetchZarfYAML(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	// Zarf init start with "zarf-init" / not all packages have versions etc.
+	packageName := fmt.Sprintf("%s%s", sources.NameFromMetadata(&pkg, false), sources.PkgSuffix(pkg.Metadata.Uncompressed))
+
+	if packageName == "" {
+		return false, nil
+	}
+	fullPath := filepath.Join(dir, packageName)
+	var localPkg v1alpha1.ZarfPackage
+
+	err = archiver.Walk(fullPath, func(f archiver.File) error {
+		if f.Name() == layout.ZarfYAML {
+			b, err := io.ReadAll(f)
+			if err != nil {
+				return err
+			}
+			if err := goyaml.Unmarshal(b, &localPkg); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	if localPkg.Metadata.AggregateChecksum != pkg.Metadata.AggregateChecksum {
+		return false, nil
+	}
+	return true, nil
+}
+
 // Pull fetches the Zarf package from the given sources.
 func Pull(ctx context.Context, src, dir, shasum string, filter filters.ComponentFilterStrategy) error {
 	u, err := url.Parse(src)
+	l := logger.From(ctx)
+
 	if err != nil {
 		return err
 	}
@@ -50,10 +99,19 @@ func Pull(ctx context.Context, src, dir, shasum string, filter filters.Component
 
 	switch u.Scheme {
 	case "oci":
-		_, err := pullOCI(ctx, src, tmpPath, shasum, filter)
+		localPkgExists, err := CheckIfPackageExists(ctx, src, dir)
 		if err != nil {
 			return err
 		}
+		if localPkgExists {
+			l.Info("package already exists locally in directory", "Directory", dir)
+			return nil
+		}
+		_, err = pullOCI(ctx, src, tmpPath, shasum, filter)
+		if err != nil {
+			return err
+		}
+
 	case "http", "https":
 		err := pullHTTP(ctx, src, tmpPath, shasum)
 		if err != nil {
