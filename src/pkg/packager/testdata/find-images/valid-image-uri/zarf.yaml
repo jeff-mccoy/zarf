@@ -1,0 +1,12 @@
+kind: ZarfPackageConfig
+metadata:
+  name: valid-image-uri
+  version: 1.0.0
+components:
+  - name: baseline
+    required: true
+    manifests:
+      - name: valid-image-uri
+        namespace: default
+        kustomizations:
+          - ./.

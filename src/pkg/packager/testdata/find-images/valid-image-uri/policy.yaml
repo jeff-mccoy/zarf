@@ -1,0 +1,25 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-image-registries
+spec:
+  background: true
+  failurePolicy: Ignore
+  rules:
+  - exclude:
+      any:
+      - resources:
+          namespaces:
+          - kube-system
+    match:
+      all:
+      - resources:
+          kinds:
+          - Pod
+    name: validate-registries
+    validate:
+      foreach:
+      - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+        pattern:
+          image: docker.io*

@@ -70,6 +70,20 @@ func TestFindImages(t *testing.T) {
 			},
 		},
 		{
+			name: "valid-image-uri",
+			cfg: &types.PackagerConfig{
+				CreateOpts: types.ZarfCreateOptions{
+					BaseDir: "./testdata/find-images/valid-image-uri",
+				},
+			},
+			expectedImages: map[string][]string{
+				"baseline": {
+					"ghcr.io/zarf-dev/zarf/agent:v0.38.1",
+					"ghcr.io/zarf-dev/zarf/agent:sha256-f8b1c2f99349516ae1bd0711a19697abcc41555076b0ae90f1a70ca6b50dcbd8.sig",
+				},
+			},
+		},
+		{
 			name: "image not found",
 			cfg: &types.PackagerConfig{
 				CreateOpts: types.ZarfCreateOptions{
