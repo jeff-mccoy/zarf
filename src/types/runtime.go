@@ -68,6 +68,8 @@ type ZarfFindImagesOptions struct {
 	Why string
 	// Optionally skip lookup of cosign artifacts when finding images
 	SkipCosign bool
+	// Update the images in zarf.yaml in place
+	UpdatePackageDefinition bool
 }
 
 // ZarfDeployOptions tracks the user-defined preferences during a package deploy.

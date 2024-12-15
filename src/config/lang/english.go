@@ -353,6 +353,7 @@ $ zarf package pull oci://ghcr.io/defenseunicorns/packages/dos-games:1.0.0 -a sk
 	CmdDevFlagRegistry             = "Override the ###ZARF_REGISTRY### value"
 	CmdDevFlagFindImagesWhy        = "Prints the source manifest for the specified image"
 	CmdDevFlagFindImagesSkipCosign = "Skip searching for cosign artifacts related to discovered images"
+	CmdDevFlagFindImagesUpdate     = "Updates zarf.yaml with found images"
 
 	CmdDevLintShort = "Lints the given package for valid schema and recommended practices"
 	CmdDevLintLong  = "Verifies the package schema, checks if any variables won't be evaluated, and checks for unpinned images/repos/files"

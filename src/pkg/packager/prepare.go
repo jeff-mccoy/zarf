@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/goccy/go-yaml/parser"
 	"github.com/zarf-dev/zarf/src/pkg/logger"
 	"os"
 	"path/filepath"
@@ -76,7 +77,57 @@ func (p *Packager) FindImages(ctx context.Context) (map[string][]string, error) 
 	}
 	p.cfg.Pkg = pkg
 
-	return p.findImages(ctx)
+	images, err := p.findImages(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if p.cfg.FindImagesOpts.UpdatePackageDefinition {
+		zarfYamlBytes, err := os.ReadFile(p.layout.ZarfYAML)
+		if err != nil {
+			return nil, err
+		}
+		zarfYaml := v1alpha1.ZarfPackage{}
+		err = yaml.Unmarshal(zarfYamlBytes, &zarfYaml)
+		if err != nil {
+			return nil, err
+		}
+		// yamlpath support of goccy/go-yaml only has index-based lookup, so we need to figure out index
+		componentToIndex := map[string]int{}
+		for i, component := range zarfYaml.Components {
+			componentToIndex[component.Name] = i
+		}
+
+		astFile, err := parser.ParseFile(p.layout.ZarfYAML, parser.ParseComments)
+		if err != nil {
+			return nil, err
+		}
+		for componentName, images := range images {
+			sortedImages := append([]string{}, images...)
+			sort.Strings(sortedImages)
+			componentMerge := map[string]interface{}{}
+			componentMerge["images"] = sortedImages
+			componentNode, err := yaml.ValueToNode(componentMerge, yaml.IndentSequence(true))
+			if err != nil {
+				return nil, err
+			}
+
+			path, err := yaml.PathString(fmt.Sprintf("$.components[%d]", componentToIndex[componentName]))
+			if err != nil {
+				return nil, err
+			}
+			err = path.MergeFromNode(astFile, componentNode)
+			if err != nil {
+				return nil, err
+			}
+		}
+		updatedZarfYaml := astFile.String()
+		err = os.WriteFile(layout.ZarfYAML, []byte(updatedZarfYaml), os.ModePerm)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return images, err
+
 }
 
 // TODO: Refactor to return output string instead of printing inside of function.
