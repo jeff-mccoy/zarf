@@ -103,6 +103,7 @@ func Clone(ctx context.Context, rootPath, address string, shallow bool) (*Reposi
 		if err != nil {
 			return nil, err
 		}
+		return r, nil
 	}
 
 	// If we're cloning the whole repo, we need to also fetch the other branches besides the default.
