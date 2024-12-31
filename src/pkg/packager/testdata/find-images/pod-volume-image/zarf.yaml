@@ -1,0 +1,12 @@
+kind: ZarfPackageConfig
+metadata:
+  name: pod-volume-image
+  version: 1.0.0
+components:
+  - name: baseline
+    required: true
+    manifests:
+      - name: pod-volume-image
+        namespace: default
+        files:
+          - deployment.yaml
