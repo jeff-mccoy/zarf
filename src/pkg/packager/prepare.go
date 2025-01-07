@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/zarf-dev/zarf/src/pkg/logger"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -16,7 +15,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zarf-dev/zarf/src/pkg/logger"
+
 	"github.com/defenseunicorns/pkg/helpers/v2"
+	sourcev1beta2 "github.com/fluxcd/source-controller/api/v1beta2"
 	"github.com/goccy/go-yaml"
 	"github.com/google/go-containerregistry/pkg/crane"
 	v1 "k8s.io/api/apps/v1"
@@ -412,6 +414,13 @@ func processUnstructuredImages(resource *unstructured.Unstructured, matchedImage
 		}
 		matchedImages = appendToImageMap(matchedImages, job.Spec.Template.Spec)
 
+	case "OCIRepository":
+		var ociRepo sourcev1beta2.OCIRepository
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(contents, &ociRepo); err != nil {
+			return nil, nil, fmt.Errorf("could not parse ocirepo: %w", err)
+		}
+		matchedImages = appendToImageMapOCIRepo(matchedImages, ociRepo.Spec)
+
 	default:
 		// Capture any custom images
 		matches := imageCheck.FindAllStringSubmatch(string(b), -1)
@@ -462,6 +471,28 @@ func appendToImageMap(imgMap map[string]bool, pod corev1.PodSpec) map[string]boo
 	for _, container := range pod.EphemeralContainers {
 		imgMap[container.Image] = true
 	}
+	return imgMap
+}
+
+func appendToImageMapOCIRepo(imgMap map[string]bool, repo sourcev1beta2.OCIRepositorySpec) map[string]bool {
+	var regex = regexp.MustCompile(`oci://(.+)`)
+	var t = regex.FindStringSubmatch(repo.URL)
+
+	s := strings.Builder{}
+	// Pulls out just the url from the regex
+	s.Write([]byte(t[1]))
+
+	if repo.Reference.Tag != "" {
+		s.WriteString(":")
+		s.WriteString(repo.Reference.Tag)
+	} else if repo.Reference.Digest != "" {
+		s.WriteString("@")
+		s.WriteString(repo.Reference.Digest)
+	} else if repo.Reference.SemVer != "" || repo.Reference.SemverFilter != "" {
+		message.Warnf("Can not use semver or semverFilter with OCIRepository")
+		return imgMap
+	}
+	imgMap[s.String()] = true
 	return imgMap
 }
 

@@ -70,6 +70,22 @@ func TestFindImages(t *testing.T) {
 			},
 		},
 		{
+			name: "flux-oci-repo",
+			cfg: &types.PackagerConfig{
+				CreateOpts: types.ZarfCreateOptions{
+					BaseDir: "./testdata/find-images/flux-oci-repo",
+				},
+			},
+			expectedImages: map[string][]string{
+				"baseline": {
+					"ghcr.io/stefanprodan/manifests/podinfo:6.4.1",
+					"ghcr.io/stefanprodan/manifests/podinfo@sha256:fc60d367cc05bedae04d6030e270daa89c3d82fa18b1a155314102b2fca39652",
+					"ghcr.io/stefanprodan/manifests/podinfo:sha256-3f4327936dd3b1c3fa2ce98e7c9d286a5e433d2bcd0a86f759bc75da285ae78c.sig",
+					"ghcr.io/stefanprodan/manifests/podinfo:sha256-fc60d367cc05bedae04d6030e270daa89c3d82fa18b1a155314102b2fca39652.sig",
+				},
+			},
+		},
+		{
 			name: "image not found",
 			cfg: &types.PackagerConfig{
 				CreateOpts: types.ZarfCreateOptions{
