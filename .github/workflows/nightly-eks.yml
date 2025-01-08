@@ -41,7 +41,7 @@ jobs:
       - name: Auth with AWS
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
-          role-to-assume: ${{ secrets.AWS_NIGHTLY_ROLE }}
+          role-to-assume: ${{ secrets.AWS_NIGHTLY_EKS_ROLE }}
           role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
           aws-region: us-east-1
           role-duration-seconds: 7200
@@ -76,8 +76,8 @@ jobs:
         if: always()
         uses: ./.github/actions/save-logs
 
-      - name: Send trigger to Slack on workflow failure
-        if: failure()
-        uses: ./.github/actions/slack
-        with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      # - name: Send trigger to Slack on workflow failure
+      #   if: failure()
+      #   uses: ./.github/actions/slack
+      #   with:
+      #     slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}

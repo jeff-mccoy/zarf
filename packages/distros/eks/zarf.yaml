@@ -19,11 +19,11 @@ variables:
 
   - name: PERMISSIONS_BOUNDARY_ARN
     description: The ARN of the IAM permissions boundary to apply to the cluster resources
-    default: arn:aws:iam::173911864621:policy/zarf_dev_base_policy
+    default: arn:aws:iam::724772091398:policy/uds_permissions_boundary
 
   - name: PERMISSIONS_BOUNDARY_TAG
     description: The tag to apply to the cluster resources to indicate the permissions boundary
-    default: zarf_dev_base_policy
+    default: uds_permissions_boundary
 
 components:
   - name: load-eksctl
