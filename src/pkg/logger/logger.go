@@ -99,6 +99,9 @@ var (
 	FormatConsole Format = "console"
 	// FormatDev uses a verbose and pretty printing devslog handler
 	FormatDev Format = "dev"
+	// FormatLegacy indicates that the user is continuing to use the legacy logger. The same as FormatNone.
+	// This option will be removed in a coming release
+	FormatLegacy Format = "legacy"
 	// FormatNone sends log writes to DestinationNone / io.Discard
 	FormatNone Format = "none"
 )
@@ -194,7 +197,7 @@ func New(cfg Config) (*slog.Logger, error) {
 			NoColor:         !bool(cfg.Color),
 		})
 	// Use discard handler if no format provided
-	case "", FormatNone:
+	case "", FormatNone, FormatLegacy:
 		handler = slog.NewTextHandler(DestinationNone, &slog.HandlerOptions{})
 	// Format not found, let's error out
 	default:

@@ -137,9 +137,9 @@ func (h *Helm) PackageChartFromLocalFiles(ctx context.Context, cosignKeyPath str
 // PackageChartFromGit is a special implementation of chart archiving that supports the https://p1.dso.mil/#/products/big-bang/ model.
 func (h *Helm) PackageChartFromGit(ctx context.Context, cosignKeyPath string) error {
 	l := logger.From(ctx)
-	l.Info("processing helm chart", "name", h.chart.Name)
+	l.Info("processing Helm chart", "name", h.chart.Name)
 	// TODO(mkcp): Remove message on logger release
-	spinner := message.NewProgressSpinner("Processing helm chart %s", h.chart.Name)
+	spinner := message.NewProgressSpinner("Processing Helm chart %s", h.chart.Name)
 	defer spinner.Stop()
 
 	// Retrieve the repo containing the chart
@@ -161,14 +161,14 @@ func (h *Helm) PackageChartFromGit(ctx context.Context, cosignKeyPath string) er
 // DownloadPublishedChart loads a specific chart version from a remote repo.
 func (h *Helm) DownloadPublishedChart(ctx context.Context, cosignKeyPath string) error {
 	l := logger.From(ctx)
-	l.Info("processing helm chart",
+	l.Info("processing Helm chart",
 		"name", h.chart.Name,
 		"version", h.chart.Version,
 		"repo", h.chart.URL,
 	)
 	start := time.Now()
 	// TODO(mkcp): Remove message on logger release
-	spinner := message.NewProgressSpinner("Processing helm chart %s:%s from repo %s", h.chart.Name, h.chart.Version, h.chart.URL)
+	spinner := message.NewProgressSpinner("Processing Helm chart %s:%s from repo %s", h.chart.Name, h.chart.Version, h.chart.URL)
 	defer spinner.Stop()
 
 	// Set up the helm pull config

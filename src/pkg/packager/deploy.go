@@ -136,7 +136,7 @@ func (p *Packager) Deploy(ctx context.Context) error {
 	message.Successf("Zarf deployment complete")
 	l.Debug("Zarf deployment complete", "duration", time.Since(start))
 
-	err = p.printTablesForDeployment(ctx, deployedComponents)
+	err = p.printTablesForDeployment(deployedComponents)
 	if err != nil {
 		return err
 	}
@@ -758,30 +758,20 @@ func (p *Packager) installChartAndManifests(ctx context.Context, componentPaths 
 
 // TODO once deploy is refactored to load the Zarf package and cluster objects in the cmd package
 // table printing should be moved to cmd
-func (p *Packager) printTablesForDeployment(ctx context.Context, componentsToDeploy []types.DeployedComponent) error {
+func (p *Packager) printTablesForDeployment(componentsToDeploy []types.DeployedComponent) error {
 	// If not init config, print the application connection table
-	if !p.cfg.Pkg.IsInitConfig() {
-		connectStrings := types.ConnectStrings{}
-		for _, comp := range componentsToDeploy {
-			for _, chart := range comp.InstalledCharts {
-				for k, v := range chart.ConnectStrings {
-					connectStrings[k] = v
-				}
+	if p.cfg.Pkg.IsInitConfig() {
+		return nil
+	}
+	connectStrings := types.ConnectStrings{}
+	for _, comp := range componentsToDeploy {
+		for _, chart := range comp.InstalledCharts {
+			for k, v := range chart.ConnectStrings {
+				connectStrings[k] = v
 			}
 		}
-		message.PrintConnectStringTable(connectStrings)
-		return nil
 	}
-	// Don't print if cluster is not configured
-	if p.cluster == nil {
-		return nil
-	}
-	// Grab a fresh copy of the state to print the most up-to-date version of the creds
-	latestState, err := p.cluster.LoadZarfState(ctx)
-	if err != nil {
-		return err
-	}
-	message.PrintCredentialTable(latestState, componentsToDeploy)
+	message.PrintConnectStringTable(connectStrings)
 	return nil
 }
 

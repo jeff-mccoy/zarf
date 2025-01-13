@@ -85,7 +85,7 @@ func preRun(cmd *cobra.Command, _ []string) error {
 
 	// Configure the global message instance.
 	var disableMessage bool
-	if LogFormat != "" {
+	if LogFormat != string(logger.FormatLegacy) {
 		disableMessage = true
 		skipLogFile = true
 		ctx := logger.WithLoggingEnabled(ctx, true)
@@ -188,7 +188,7 @@ func init() {
 
 	// Logs
 	rootCmd.PersistentFlags().StringVarP(&LogLevelCLI, "log-level", "l", v.GetString(common.VLogLevel), lang.RootCmdFlagLogLevel)
-	rootCmd.PersistentFlags().StringVar(&LogFormat, "log-format", v.GetString(common.VLogFormat), "[beta] Select a logging format. Defaults to 'console'. Valid options are: 'console', 'json', 'dev'")
+	rootCmd.PersistentFlags().StringVar(&LogFormat, "log-format", v.GetString(common.VLogFormat), "[beta] Select a logging format. Defaults to 'console'. Valid options are: 'console', 'json', 'dev', 'legacy'. The legacy option will be removed in a coming release")
 	rootCmd.PersistentFlags().BoolVar(&SkipLogFile, "no-log-file", v.GetBool(common.VNoLogFile), lang.RootCmdFlagSkipLogFile)
 	rootCmd.PersistentFlags().BoolVar(&message.NoProgress, "no-progress", v.GetBool(common.VNoProgress), lang.RootCmdFlagNoProgress)
 	rootCmd.PersistentFlags().BoolVar(&NoColor, "no-color", v.GetBool(common.VNoColor), lang.RootCmdFlagNoColor)

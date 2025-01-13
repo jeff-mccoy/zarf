@@ -50,7 +50,7 @@ func (h *Helm) InstallOrUpgradeChart(ctx context.Context) (types.ConnectStrings,
 		h.chart.Version,
 		source)
 	defer spinner.Stop()
-	l.Info("processing helm chart", "name", h.chart.Name, "version", h.chart.Version, "source", source)
+	l.Info("processing Helm chart", "name", h.chart.Name, "version", h.chart.Version, "source", source)
 
 	// If no release name is specified, use the chart name.
 	if h.chart.ReleaseName == "" {
@@ -154,7 +154,7 @@ func (h *Helm) InstallOrUpgradeChart(ctx context.Context) (types.ConnectStrings,
 		}
 	}
 	spinner.Success()
-	l.Debug("done processing helm chart", "name", h.chart.Name, "duration", time.Since(start))
+	l.Debug("done processing Helm chart", "name", h.chart.Name, "duration", time.Since(start))
 
 	// return any collected connect strings for zarf connect.
 	return postRender.connectStrings, h.chart.ReleaseName, nil

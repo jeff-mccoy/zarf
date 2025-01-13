@@ -26,7 +26,7 @@ zarf tools clear-cache [flags]
 ```
   -a, --architecture string        Architecture for OCI images and Zarf packages
       --insecure-skip-tls-verify   Skip checking server's certificate for validity. This flag should only be used if you have a specific reason and accept the reduced security posture.
-      --log-format string          [beta] Select a logging format. Defaults to 'console'. Valid options are: 'console', 'json', 'dev'
+      --log-format string          [beta] Select a logging format. Defaults to 'console'. Valid options are: 'console', 'json', 'dev', 'legacy'. The legacy option will be removed in a coming release (default "console")
   -l, --log-level string           Log level when running Zarf. Valid options are: warn, info, debug, trace (default "info")
       --no-color                   Disable colors in output
       --no-log-file                Disable log file creation
