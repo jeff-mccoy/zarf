@@ -953,7 +953,7 @@ func splitFile(srcPath string, chunkSize int) (err error) {
 	//   iteration as soon as we're done writing.
 	for {
 		path := fmt.Sprintf("%s.part%03d", srcPath, fileCount+1)
-		dstFile, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, helpers.ReadAllWriteUser)
+		dstFile, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, helpers.ReadAllWriteUser)
 		if err != nil {
 			return err
 		}
